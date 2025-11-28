@@ -53,8 +53,6 @@ class S3StorageClient:
             "Key": key,
             "ContentType": mime_type,
         }
-        if visibility == FileVisibility.PUBLIC:
-            params["ACL"] = "public-read"
 
         async with aioboto3.Session().client("s3", **self._validated_client_kwargs()) as client:
             return await client.generate_presigned_url(
@@ -100,16 +98,17 @@ class FileStorageService:
             return "documents"
         return "files"
 
-    def _build_key(self, user_uuid: str, folder: str, filename: str) -> str:
+    def _build_key(self, user_uuid: str, folder: str, filename: str, visibility: FileVisibility) -> str:
+        visibility_prefix = "public" if visibility == FileVisibility.PUBLIC else "private"
         safe_name = re.sub(r"[^A-Za-z0-9._-]", "_", filename)
         unique_suffix = uuid4().hex
-        return "/".join([folder, user_uuid, f"{unique_suffix}_{safe_name}"])
+        return "/".join([visibility_prefix, folder, user_uuid, f"{unique_suffix}_{safe_name}"])
 
     async def create_presigned_upload(self, data: PresignUploadRequest) -> tuple:
         kind = data.kind or self._guess_kind(data.mime_type)
         folder = data.folder or self._default_folder(kind)
 
-        key = self._build_key(str(data.user_uuid), folder, data.file_name)
+        key = self._build_key(str(data.user_uuid), folder, data.file_name, data.visibility)
         expires_in = settings.S3_PRESIGNED_EXPIRES_IN
 
         file_obj = await self.file_service.create(
@@ -119,7 +118,7 @@ class FileStorageService:
                 key=key,
                 file_name=data.file_name,
                 mime_type=data.mime_type,
-                size_bytes=data.size_bytes,
+                size_bytes=data.size_bytes or 0,
                 visibility=data.visibility,
                 kind=kind,
                 folder=folder,
