@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
 
     # RPC
+    GRPC_SERVER_PORT: int = 50051
     RPC_API_URL: str = "localhost:50051"
 
     # S3
@@ -42,7 +43,7 @@ class Settings(BaseSettings):
     S3_USE_SSL: bool = True
     S3_FORCE_PATH_STYLE: bool = True
     S3_PRESIGNED_EXPIRES_IN: int = 900  # seconds
-    S3_PUBLIC_BASE_URL: str | None = None
+
 
     @property
     def enable_docs(self) -> bool:

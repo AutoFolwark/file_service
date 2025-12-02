@@ -13,28 +13,22 @@ class FileService(BaseService[FileObject, FileCreate, FileUpdate]):
     def __init__(self, session: AsyncSession):
         super().__init__(FileObject, session)
 
-    async def list_for_user(
-        self,
-        user_uuid: str,
-        visibility: FileVisibility | None = None,
-        folder: str | None = None,
-        kind: FileKind | None = None,
-    ) -> Sequence[FileObject]:
-        stmt = select(FileObject).where(FileObject.user_uuid == user_uuid)
-        if visibility:
-            stmt = stmt.where(FileObject.visibility == visibility)
-        if folder:
-            stmt = stmt.where(FileObject.folder == folder)
-        if kind:
-            stmt = stmt.where(FileObject.kind == kind)
-        result = await self.session.execute(stmt.order_by(FileObject.created_at.desc()))
-        return result.scalars().all()
-
-    async def mark_status(self, file_id: int, status: FileStatus) -> FileObject | None:
+    async def mark_status(
+        self, file_id: int, status: FileStatus, *, size_bytes: int | None = None
+    ) -> FileObject | None:
         obj = await self.get(file_id)
         if not obj:
             return None
         obj.status = status
+        if size_bytes is not None:
+            obj.size_bytes = size_bytes
         await self.session.commit()
         await self.session.refresh(obj)
         return obj
+
+    async def list_by_status(
+        self, status: FileStatus, limit: int = 100
+    ) -> Sequence[FileObject]:
+        query = select(self.model).where(self.model.status == status).limit(limit)
+        result = await self.session.execute(query)
+        return result.scalars().all()

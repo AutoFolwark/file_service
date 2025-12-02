@@ -10,7 +10,6 @@ class FileObject(Base):
     __tablename__ = "file_object"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    user_uuid: Mapped[str] = mapped_column(String(length=36), nullable=False)
     bucket: Mapped[str] = mapped_column(String(length=255), nullable=False)
     key: Mapped[str] = mapped_column(String(length=512), nullable=False, unique=True)
     file_name: Mapped[str] = mapped_column(String(length=255), nullable=False)

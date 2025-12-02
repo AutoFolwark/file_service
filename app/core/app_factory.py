@@ -7,7 +7,6 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_problem.handler import new_exception_handler, add_exception_handler
 
-from app.api.api_v1.api import private_v1_router, public_v1_router
 from app.config import settings
 from app.core.logger import logger
 
@@ -16,12 +15,6 @@ def setup_middleware_and_handlers(app: FastAPI):
     eh = new_exception_handler()
     add_exception_handler(app, eh)
 
-def setup_routers(app: FastAPI):
-    app.include_router(private_v1_router)
-    app.include_router(public_v1_router)
-    @app.get("/health", tags=["Health"])
-    async def health_check():
-        return {"status": "ok"}
 
 def create_app(
         custom_redis_client: Optional[redis.Redis] = None,
@@ -34,7 +27,13 @@ def create_app(
         else:
             redis_client = custom_redis_client
         FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
-        logger.info(f"{settings.APP_NAME} started!")
+        logger.info(
+            "Application startup complete",
+            app=settings.APP_NAME,
+            environment=settings.ENVIRONMENT,
+            docs_enabled=settings.enable_docs,
+            redis_configured=bool(settings.REDIS_URL),
+        )
         yield
 
 
@@ -54,6 +53,4 @@ def create_app(
     )
 
     setup_middleware_and_handlers(app)
-    setup_routers(app)
-
     return app

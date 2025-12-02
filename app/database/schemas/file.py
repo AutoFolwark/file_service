@@ -4,7 +4,6 @@ from app.enums.file import FileKind, FileStatus, FileVisibility
 
 
 class FileCreate(BaseModel):
-    user_uuid: str
     bucket: str
     key: str
     file_name: str

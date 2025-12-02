@@ -8,16 +8,14 @@ from app.enums.file import FileKind, FileStatus, FileVisibility
 
 
 class PresignUploadRequest(BaseModel):
-    user_uuid: UUID
     file_name: str = Field(..., description="Original file name")
     mime_type: str = Field(..., description="MIME type of the file")
-    size_bytes: int | None = Field(
-        None, description="Optional declared file size in bytes (can be omitted)"
-    )
     visibility: FileVisibility = FileVisibility.PRIVATE
     folder: str | None = Field(None, description="Optional virtual folder prefix")
     kind: FileKind | None = Field(None, description="Override auto-detected kind for routing")
 
+class BatchPresignUploadRequest(PresignUploadRequest):
+    amount_of_files: int = Field(..., description="Number of files to upload")
 
 class PresignUploadResponse(BaseModel):
     file_id: int
@@ -31,7 +29,6 @@ class PresignUploadResponse(BaseModel):
 
 class FileResponse(BaseModel):
     id: int
-    user_uuid: str
     bucket: str
     key: str
     file_name: str
