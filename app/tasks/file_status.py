@@ -8,13 +8,13 @@ from app.database.db.session import AsyncSessionLocal
 from app.services.file_status_sync import FileStatusSyncService
 
 
-@celery_app.on_after_configure.connect
+@celery_app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     # Every minute by default; adjust as needed via CELERY_BEAT_SCHEDULE override.
     sender.add_periodic_task(
         60.0, sync_pending_uploads.s(), name="sync_pending_uploads_every_minute"
     )
-    logger.debug("Scheduled periodic task sync_pending_uploads every 60s")
+    logger.info("Scheduled periodic task sync_pending_uploads every 60s")
 
 
 @celery_app.task(name="app.tasks.file_status.sync_pending_uploads")

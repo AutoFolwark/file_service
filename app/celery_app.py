@@ -16,10 +16,14 @@ celery_app = Celery(
     "vinaslt_files",
     broker=_broker_url(),
     backend=_result_backend(),
+    include=["app.tasks.file_status"],
 )
 
 celery_app.conf.timezone = os.getenv("TZ", "UTC")
-celery_app.autodiscover_tasks(["app.tasks"])
+# Discover tasks in app/tasks modules.
+celery_app.autodiscover_tasks(["app"], related_name="tasks")
+# Use in-memory beat scheduler so schedules come from code (no persistent DB file).
+celery_app.conf.beat_scheduler = "celery.beat:Scheduler"
 
 # Beat schedule will be configured in tasks modules.
 

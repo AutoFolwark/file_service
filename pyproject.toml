@@ -29,6 +29,7 @@ celery = "^5.6.0"
 grpcio-reflection = "^1.76.0"
 googleapis-common-protos = "^1.72.0"
 grpcio-tools = "^1.76.0"
+aio-pika = "^9.5.8"
 
 [tool.poetry.group.dev.dependencies]
 alembic = "^1.16.5"

@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Iterable, Sequence
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -30,5 +30,16 @@ class FileService(BaseService[FileObject, FileCreate, FileUpdate]):
         self, status: FileStatus, limit: int = 100
     ) -> Sequence[FileObject]:
         query = select(self.model).where(self.model.status == status).limit(limit)
+        result = await self.session.execute(query)
+        return result.scalars().all()
+
+    async def list_by_statuses(
+        self, statuses: Iterable[FileStatus], limit: int = 100
+    ) -> Sequence[FileObject]:
+        query = (
+            select(self.model)
+            .where(self.model.status.in_(list(statuses)))
+            .limit(limit)
+        )
         result = await self.session.execute(query)
         return result.scalars().all()

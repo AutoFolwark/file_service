@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
 
     # RPC
-    GRPC_SERVER_PORT: int = 50051
+    GRPC_SERVER_PORT: int = 50053
     RPC_API_URL: str = "localhost:50051"
 
     # S3
@@ -43,6 +43,10 @@ class Settings(BaseSettings):
     S3_USE_SSL: bool = True
     S3_FORCE_PATH_STYLE: bool = True
     S3_PRESIGNED_EXPIRES_IN: int = 900  # seconds
+
+    # RabbitMQ
+    RABBITMQ_URL: str = "amqp://guest:guest@localhost/"
+    RABBITMQ_EXCHANGE_NAME: str = "events"
 
 
     @property
