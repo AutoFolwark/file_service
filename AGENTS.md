@@ -21,15 +21,15 @@
 
 ## Testing Guidelines
 - Tests use Pytest; place files under a top-level `tests/` directory named `test_*.py`.
-- Write API tests against FastAPI’s test client; mock external services (Redis, S3, RPC) to keep runs deterministic.
+- Write API tests against FastAPI’s test client; mock external services (S3, RPC, RabbitMQ) to keep runs deterministic.
 - Target high coverage for routers, services, and task logic before merging significant changes.
 - Run `poetry run pytest` locally; prefer small, focused fixtures over shared global state.
 
 ## Commit & Pull Request Guidelines
-- Use short, imperative commit messages (e.g., `add presigned url endpoint`, `fix redis cache init`). Keep one concern per commit.
+- Use short, imperative commit messages (e.g., `add presigned url endpoint`, `adjust celery schedule`). Keep one concern per commit.
 - PRs should describe motivation, main changes, and any operational notes (migrations, new env vars, breaking API tweaks). Link issues if applicable.
 - Include screenshots or curl examples when altering endpoints or response shapes. Mention how to test locally (commands/env needed).
 
 ## Configuration & Security Tips
-- Required env keys: database (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`), Redis (`REDIS_URL`), and S3 credentials (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `S3_BUCKET`, etc.). Never commit real secrets.
+- Required env keys: database (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`), RabbitMQ (`RABBITMQ_URL`, `RABBITMQ_EXCHANGE_NAME`), and S3 credentials (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `S3_BUCKET`, etc.). Never commit real secrets.
 - Default docs (`/docs`, `/redoc`) only expose in development; ensure `ENVIRONMENT=production` in deployed settings.

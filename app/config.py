@@ -21,9 +21,6 @@ class Settings(BaseSettings):
     DB_USER: str = "postgres"
     DB_PASS: str = "testpass"
 
-    # Redis
-    REDIS_URL: str = "redis://localhost:6379"
-
     # Application
     APP_NAME: str = "files-service"
     DEBUG: bool = True
