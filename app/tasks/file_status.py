@@ -1,10 +1,8 @@
 import asyncio
 
-from celery.schedules import crontab
-
 from app.celery_app import celery_app
 from app.core.logger import logger
-from app.database.db.session import AsyncSessionLocal
+from app.database.db.session import get_db_context
 from app.services.file_status_sync import FileStatusSyncService
 
 
@@ -20,7 +18,7 @@ def setup_periodic_tasks(sender, **kwargs):
 @celery_app.task(name="app.tasks.file_status.sync_pending_uploads")
 def sync_pending_uploads(batch_size: int = 100) -> list[int]:
     async def _run() -> list[int]:
-        async with AsyncSessionLocal() as session:
+        async with get_db_context() as session:
             service = FileStatusSyncService(session)
             logger.info("Starting pending upload sync", batch_size=batch_size)
             updated = await service.sync_pending_uploads(batch_size=batch_size)
