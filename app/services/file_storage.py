@@ -95,6 +95,14 @@ class S3StorageClient:
                 if error_code in {"404", "NoSuchKey", "NotFound"}:
                     logger.warning("S3 object missing", bucket=bucket, key=key, error_code=error_code)
                     return False, None
+                if error_code in {"403", "Forbidden", "AccessDenied"}:
+                    logger.warning(
+                        "S3 head_object denied; treating as missing",
+                        bucket=bucket,
+                        key=key,
+                        error_code=error_code,
+                    )
+                    return False, None
                 logger.exception("S3 head_object failed", bucket=bucket, key=key)
                 raise
 
@@ -201,6 +209,16 @@ class FileStorageService:
 
     async def download_url(self, file_id: int, expires_in: int | None = None) -> str:
         file_obj = await self._get_file(file_id)
+
+        exists, _ = await self.s3_client.object_info(bucket=file_obj.bucket, key=file_obj.key)
+        if not exists:
+            logger.warning(
+                "Requested download for missing S3 object",
+                file_id=file_obj.id,
+                bucket=file_obj.bucket,
+                key=file_obj.key,
+            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found in storage")
 
         url = await self.s3_client.presign_download(
             bucket=file_obj.bucket,
