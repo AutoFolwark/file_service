@@ -10,7 +10,7 @@ def _broker_url() -> str:
     return settings.RABBITMQ_URL
 
 celery_app = Celery(
-    "vinaslt_files",
+    "files",
     broker=_broker_url(),
     include=["app.tasks.file_status"],
 )

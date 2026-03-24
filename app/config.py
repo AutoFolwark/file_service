@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     AWS_ACCESS_KEY_ID: str | None = None
     AWS_SECRET_ACCESS_KEY: str | None = None
     AWS_REGION: str = "eu-north-1"
-    S3_BUCKET: str = "vinas-files-development"
+    S3_BUCKET: str = "files-development"
     S3_ENDPOINT_URL: str | None = None
     S3_USE_SSL: bool = True
     S3_FORCE_PATH_STYLE: bool = True
